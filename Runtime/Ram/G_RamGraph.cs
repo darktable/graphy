@@ -11,6 +11,7 @@
  * Attribution is not required, but it is always welcomed!
  * -------------------------------------*/
 
+using System;
 using Tayx.Graphy.Graph;
 using UnityEngine;
 using UnityEngine.UI;
@@ -54,9 +55,14 @@ namespace Tayx.Graphy.Ram
 
         #region Methods -> Unity Callbacks
 
-        private void Update()
+        private void OnEnable()
         {
-            UpdateGraph();
+            GraphyManager.UpdateEvent += UpdateGraph;
+        }
+
+        private void OnDisable()
+        {
+            GraphyManager.UpdateEvent -= UpdateGraph;
         }
 
         #endregion
@@ -71,7 +77,7 @@ namespace Tayx.Graphy.Ram
             {
                 /*
                  * Note: this is fine, since we don't much care what granularity we use if the graph
-                 * has not been initialized, i.e. it's disabled. There is no chance that for some reason 
+                 * has not been initialized, i.e. it's disabled. There is no chance that for some reason
                  * parameters will not stay up to date if at some point in the future the graph is enabled:
                  * at the end of Init(), UpdateParameters() is called again.
                  */
@@ -114,9 +120,9 @@ namespace Tayx.Graphy.Ram
 
         #region Methods -> Protected Override
 
-        protected override void UpdateGraph()
+        protected override void UpdateGraph(float unscaledDeltaTime)
         {
-            // Since we no longer initialize by default OnEnable(), 
+            // Since we no longer initialize by default OnEnable(),
             // we need to check here, and Init() if needed
             if( !m_isInitialized )
             {

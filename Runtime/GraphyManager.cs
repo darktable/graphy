@@ -12,6 +12,7 @@
  * -------------------------------------*/
 
 using System;
+using System.Diagnostics;
 using UnityEngine;
 using Tayx.Graphy.Audio;
 using Tayx.Graphy.Fps;
@@ -19,6 +20,7 @@ using Tayx.Graphy.Ram;
 using Tayx.Graphy.Utils;
 using Tayx.Graphy.Advanced;
 using Tayx.Graphy.Utils.NumString;
+using Debug = UnityEngine.Debug;
 
 #if GRAPHY_NEW_INPUT
 using UnityEngine.InputSystem;
@@ -31,6 +33,9 @@ namespace Tayx.Graphy
     /// </summary>
     public class GraphyManager : G_Singleton<GraphyManager>
     {
+        private static readonly float TicksToSeconds = 1.0f / Stopwatch.Frequency;
+        public static event Action<float> UpdateEvent;
+
         protected GraphyManager()
         {
         }
@@ -204,6 +209,8 @@ namespace Tayx.Graphy
         private G_AudioMonitor m_audioMonitor = null;
 
         private ModulePreset m_modulePresetState = ModulePreset.FPS_BASIC_ADVANCED_FULL;
+
+        private Stopwatch m_stopwatch;
 
         #endregion
 
@@ -561,6 +568,10 @@ namespace Tayx.Graphy
             {
                 CheckForHotkeyPresses();
             }
+
+            var elapsedTime = m_stopwatch.ElapsedTicks * TicksToSeconds;
+            m_stopwatch.Restart();
+            UpdateEvent?.Invoke(elapsedTime);
         }
 
         private void OnApplicationFocus( bool isFocused )
@@ -811,6 +822,8 @@ namespace Tayx.Graphy
                 // We need to enable this on startup because we disable it in GraphyManagerEditor
                 GetComponent<Canvas>().enabled = true;
             }
+
+            m_stopwatch = Stopwatch.StartNew();
 
             m_initialized = true;
         }

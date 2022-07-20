@@ -49,9 +49,14 @@ namespace Tayx.Graphy.Fps
 
         #region Methods -> Unity Callbacks
 
-        private void Update()
+        private void OnEnable()
         {
-            UpdateGraph();
+            GraphyManager.UpdateEvent += UpdateGraph;
+        }
+
+        private void OnDisable()
+        {
+            GraphyManager.UpdateEvent -= UpdateGraph;
         }
 
         #endregion
@@ -91,16 +96,16 @@ namespace Tayx.Graphy.Fps
 
         #region Methods -> Protected Override
 
-        protected override void UpdateGraph()
+        protected override void UpdateGraph(float unscaledDeltaTime)
         {
-            // Since we no longer initialize by default OnEnable(), 
+            // Since we no longer initialize by default OnEnable(),
             // we need to check here, and Init() if needed
             if( !m_isInitialized )
             {
                 Init();
             }
 
-            short fps = (short) (1 / Time.unscaledDeltaTime);
+            short fps = (short) (1 / unscaledDeltaTime);
 
             int currentMaxFps = 0;
 
