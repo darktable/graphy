@@ -57,9 +57,62 @@ namespace Tayx.Graphy.Fps
             Init();
         }
 
-        private void Update()
+        private void OnEnable()
         {
-            m_deltaTime += Time.unscaledDeltaTime;
+            GraphyManager.UpdateEvent += UpdateText;
+        }
+
+        private void OnDisable()
+        {
+            GraphyManager.UpdateEvent -= UpdateText;
+        }
+
+        #endregion
+
+        #region Methods -> Public
+
+        public void UpdateParameters()
+        {
+            m_updateRate = m_graphyManager.FpsTextUpdateRate;
+        }
+
+        #endregion
+
+        #region Methods -> Private
+
+        /// <summary>
+        /// Assigns color to a text according to their fps numeric value and
+        /// the colors specified in the 3 categories (Good, Caution, Critical).
+        /// </summary>
+        ///
+        /// <param name="text">
+        /// UI Text component to change its color
+        /// </param>
+        ///
+        /// <param name="fps">
+        /// Numeric fps value
+        /// </param>
+        private void SetFpsRelatedTextColor( Text text, float fps )
+        {
+            int roundedFps = Mathf.RoundToInt( fps );
+
+            if( roundedFps >= m_graphyManager.GoodFPSThreshold )
+            {
+                text.color = m_graphyManager.GoodFPSColor;
+            }
+            else if( roundedFps >= m_graphyManager.CautionFPSThreshold )
+            {
+                text.color = m_graphyManager.CautionFPSColor;
+            }
+            else
+            {
+                text.color = m_graphyManager.CriticalFPSColor;
+            }
+        }
+
+        private void UpdateText(float unscaledDeltaTime)
+        {
+            m_deltaTime += unscaledDeltaTime;
 
             m_frameCount++;
 
@@ -93,49 +146,6 @@ namespace Tayx.Graphy.Fps
                 // Reset variables
                 m_deltaTime = 0f;
                 m_frameCount = 0;
-            }
-        }
-
-        #endregion
-
-        #region Methods -> Public
-
-        public void UpdateParameters()
-        {
-            m_updateRate = m_graphyManager.FpsTextUpdateRate;
-        }
-
-        #endregion
-
-        #region Methods -> Private
-
-        /// <summary>
-        /// Assigns color to a text according to their fps numeric value and
-        /// the colors specified in the 3 categories (Good, Caution, Critical).
-        /// </summary>
-        /// 
-        /// <param name="text">
-        /// UI Text component to change its color
-        /// </param>
-        /// 
-        /// <param name="fps">
-        /// Numeric fps value
-        /// </param>
-        private void SetFpsRelatedTextColor( Text text, float fps )
-        {
-            int roundedFps = Mathf.RoundToInt( fps );
-
-            if( roundedFps >= m_graphyManager.GoodFPSThreshold )
-            {
-                text.color = m_graphyManager.GoodFPSColor;
-            }
-            else if( roundedFps >= m_graphyManager.CautionFPSThreshold )
-            {
-                text.color = m_graphyManager.CautionFPSColor;
-            }
-            else
-            {
-                text.color = m_graphyManager.CriticalFPSColor;
             }
         }
 

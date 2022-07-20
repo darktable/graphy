@@ -30,8 +30,6 @@ namespace Tayx.Graphy.Fps
         private short m_fpsSamplesCount = 0;
         private short m_indexSample = 0;
 
-        private float m_unscaledDeltaTime = 0f;
-
         #endregion
 
         #region Properties -> Public
@@ -50,13 +48,43 @@ namespace Tayx.Graphy.Fps
             Init();
         }
 
-        private void Update()
+        private void OnEnable()
         {
-            m_unscaledDeltaTime = Time.unscaledDeltaTime;
+            GraphyManager.UpdateEvent += UpdateMonitor;
+        }
 
+        private void OnDisable()
+        {
+            GraphyManager.UpdateEvent -= UpdateMonitor;
+        }
+
+        #endregion
+
+        #region Methods -> Public
+
+        public void UpdateParameters()
+        {
+            m_onePercentSamples = (short) (m_fpsSamplesCapacity / 100);
+            m_zero1PercentSamples = (short) (m_fpsSamplesCapacity / 1000);
+        }
+
+        #endregion
+
+        #region Methods -> Private
+
+        private void Init()
+        {
+            m_fpsSamples = new short[m_fpsSamplesCapacity];
+            m_fpsSamplesSorted = new short[m_fpsSamplesCapacity];
+
+            UpdateParameters();
+        }
+
+        private void UpdateMonitor(float unscaledDeltaTime)
+        {
             // Update fps and ms
 
-            CurrentFPS = (short) (Mathf.RoundToInt( 1f / m_unscaledDeltaTime ));
+            CurrentFPS = (short) (Mathf.RoundToInt( 1f / unscaledDeltaTime ));
 
             // Update avg fps
 
@@ -119,28 +147,6 @@ namespace Tayx.Graphy.Fps
             }
 
             OnePercentFPS = (short) ((float) totalAddedFps / (float) m_onePercentSamples);
-        }
-
-        #endregion
-
-        #region Methods -> Public
-
-        public void UpdateParameters()
-        {
-            m_onePercentSamples = (short) (m_fpsSamplesCapacity / 100);
-            m_zero1PercentSamples = (short) (m_fpsSamplesCapacity / 1000);
-        }
-
-        #endregion
-
-        #region Methods -> Private
-
-        private void Init()
-        {
-            m_fpsSamples = new short[m_fpsSamplesCapacity];
-            m_fpsSamplesSorted = new short[m_fpsSamplesCapacity];
-
-            UpdateParameters();
         }
 
         #endregion

@@ -22,7 +22,7 @@ namespace Tayx.Graphy.Graph
         /// <summary>
         /// Updates the graph/s.
         /// </summary>
-        protected abstract void UpdateGraph();
+        protected abstract void UpdateGraph(float unscaledDeltaTime);
 
         /// <summary>
         /// Creates the points for the graph/s.

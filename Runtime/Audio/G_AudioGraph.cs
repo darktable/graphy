@@ -11,6 +11,7 @@
  * Attribution is not required, but it is always welcomed!
  * -------------------------------------*/
 
+using System;
 using Tayx.Graphy.Graph;
 using UnityEngine;
 using UnityEngine.UI;
@@ -55,25 +56,24 @@ namespace Tayx.Graphy.Audio
              * We used to Init() here regardless of
              * whether this module was enabled.
              * The reason we don't Init() here
-             * anymore is that some users are on 
-             * platforms that do not support the arrays 
+             * anymore is that some users are on
+             * platforms that do not support the arrays
              * in the Shaders.
              *
              * See: https://github.com/Tayx94/graphy/issues/17
-             * 
+             *
              * Even though we don't Init() competely
-             * here anymore, we still need 
+             * here anymore, we still need
              * m_audioMonitor for in Update()
              * --------------------------------------*/
             m_audioMonitor = GetComponent<G_AudioMonitor>();
+
+            GraphyManager.UpdateEvent += UpdateGraph;
         }
 
-        private void Update()
+        private void OnDisable()
         {
-            if( m_audioMonitor.SpectrumDataAvailable )
-            {
-                UpdateGraph();
-            }
+            GraphyManager.UpdateEvent -= UpdateGraph;
         }
 
         #endregion
@@ -120,9 +120,14 @@ namespace Tayx.Graphy.Audio
 
         #region Methods -> Protected Override
 
-        protected override void UpdateGraph()
+        protected override void UpdateGraph(float unscaledDeltaTime)
         {
-            // Since we no longer initialize by default OnEnable(), 
+            if( !m_audioMonitor.SpectrumDataAvailable )
+            {
+                return;
+            }
+
+            // Since we no longer initialize by default OnEnable(),
             // we need to check here, and Init() if needed
             if( !m_isInitialized )
             {
